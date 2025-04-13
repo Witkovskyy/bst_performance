@@ -68,12 +68,15 @@ void postorder(Tree* root) {
 int main() {
     Tree* root = nullptr;
     // Amount of nums 
-    int n = 10000;
+    int n = 200021;
     int number;
+    int* tofind = new int[n];
+    
 
     std::chrono::high_resolution_clock::time_point start;
     std::chrono::high_resolution_clock::time_point end;
     std::chrono::nanoseconds duration;
+    std::chrono::nanoseconds sum_of_searches;
 
     std::random_device rand;
     std::mt19937 gen(rand());
@@ -89,28 +92,40 @@ int main() {
         } while (std::find(excluded.begin(),excluded.end(),number)!=excluded.end());
         excluded.push_back(number);
         numbers.push_back(number);
+        tofind[i] = number;
     }
 
     for(int j=0;j<10;j++){
 
-        auto start = std::chrono::high_resolution_clock::now();
+        start = std::chrono::high_resolution_clock::now();
 
         for (int i=0;i<n;i++){
             number = numbers[i];
             root = insert(root,number);
         }
         
-        auto end = std::chrono::high_resolution_clock::now();
+        end = std::chrono::high_resolution_clock::now();
 
-        auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+        duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
         creation_times.push_back(duration);
+    }
+
+    for (int i=0;i<n;i++){
+
+        start = std::chrono::high_resolution_clock::now();
+        root = search(root, tofind[i]);
+        end = std::chrono::high_resolution_clock::now();
+        duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+        sum_of_searches += duration;
+
     }
 
     // std::cout << "Inorder: ";
     // inorder(root);
     
-    std::cout << "Czas wykonania: " << duration.count() << " micros" << std::endl;
-
+    // std::cout << "Czas wykonania: " << duration.count() << " nanoseconds" << std::endl;
+    std::cout << sum_of_searches.count() << " nanoseconds ";
+    std::cout << creation_times[0].count();
     return 0;
 }
