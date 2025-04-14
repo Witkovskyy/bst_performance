@@ -61,71 +61,121 @@ void postorder(Tree* root) {
     if (root) {
         postorder(root->left);
         postorder(root->right);
-        std::cout << root->info << " ";
+        // std::cout << root->info << " ";
     }
 }
 
 int main() {
-    Tree* root = nullptr;
-    // Amount of nums 
-    int n = 200021;
-    int number;
-    int* tofind = new int[n];
-    
 
-    std::chrono::high_resolution_clock::time_point start;
-    std::chrono::high_resolution_clock::time_point end;
-    std::chrono::nanoseconds duration;
-    std::chrono::nanoseconds sum_of_searches;
+    for (int iterator=1;iterator<16;iterator++){
 
-    std::random_device rand;
-    std::mt19937 gen(rand());
-    std::uniform_int_distribution<> dist(1,10*n);
+        
+        Tree* root = nullptr;
+        // Amount of nums 
+        int n = 10000*iterator;
+        int number;
+        int* tofind = new int[n];
+        int creation_avg;
+        int postorder_avg;
+        
 
-    std::vector<std::chrono::nanoseconds> creation_times = {};
-    std::vector<int> excluded = {}; 
-    std::vector<int> numbers = {};
+        std::chrono::high_resolution_clock::time_point start;
+        std::chrono::high_resolution_clock::time_point end;
+        std::chrono::nanoseconds duration;
+        std::chrono::nanoseconds sum_of_searches;
 
-    for (int i=0;i<n;i++){
-        do {
-            number = dist(gen);
-        } while (std::find(excluded.begin(),excluded.end(),number)!=excluded.end());
-        excluded.push_back(number);
-        numbers.push_back(number);
-        tofind[i] = number;
-    }
+        std::random_device rand;
+        std::mt19937 gen(rand());
+        std::uniform_int_distribution<> dist(1,10*n);
 
-    for(int j=0;j<10;j++){
+        std::vector<std::chrono::nanoseconds> creation_times = {};
+        std::vector<std::chrono::nanoseconds> postorder_times = {};
+        std::vector<int> excluded = {}; 
+        std::vector<int> numbers = {};
 
-        start = std::chrono::high_resolution_clock::now();
+        std::chrono::nanoseconds creation_sum(0);
+        std::chrono::nanoseconds postorder_sum(0);
 
         for (int i=0;i<n;i++){
-            number = numbers[i];
-            root = insert(root,number);
+            do {
+                number = dist(gen);
+            } while (std::find(excluded.begin(),excluded.end(),number)!=excluded.end());
+            excluded.push_back(number);
+            numbers.push_back(number);
+            tofind[i] = number;
         }
+
+        for(int j=0;j<10;j++){
+
+            start = std::chrono::high_resolution_clock::now();
+
+            for (int i=0;i<n;i++){
+                number = numbers[i];
+                root = insert(root,number);
+            }
+            
+            end = std::chrono::high_resolution_clock::now();
+
+            duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+
+            creation_times.push_back(duration);
+        }
+
+        for (int i=0;i<n;i++){
+
+            start = std::chrono::high_resolution_clock::now();
+            search(root, tofind[i]);
+            end = std::chrono::high_resolution_clock::now();
+            duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+            sum_of_searches += duration;
+
+        }
+
+        for(int j=0;j<10;j++){
+
+            start = std::chrono::high_resolution_clock::now();
+
+            postorder(root);
+
+            end = std::chrono::high_resolution_clock::now();
+
+            duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+
+            postorder_times.push_back(duration);
+        }
+
+        // std::cout << "Inorder: ";
+        // inorder(root);
         
-        end = std::chrono::high_resolution_clock::now();
+        // std::cout << "Czas wykonania: " << duration.count() << " nanoseconds" << std::endl;
+        std::cout << sum_of_searches.count() << " nanoseconds ";
+        std::cout << creation_times[0].count();
+        std::cout << postorder_times[0].count();
+        for(int i=0;i<postorder_times.size();i++)
+        {
+            std::cout << postorder_times[i].count() << std::endl;
+        }
 
-        duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+        for(int k=0;k<10;k++){
+            creation_sum+=creation_times[k];
+        }
+        creation_avg = creation_sum.count()/10;
 
-        creation_times.push_back(duration);
+        for(int k=0;k<10;k++){
+            postorder_sum+=postorder_times[k];
+        }
+        postorder_avg = postorder_sum.count()/10;
+
+
+        std::ofstream file("bst.txt", std::ios::app);
+
+        if (file.is_open()) {
+            file << creation_avg << "," << postorder_avg << std::endl;
+        }
+
+        file.close();
+
     }
 
-    for (int i=0;i<n;i++){
-
-        start = std::chrono::high_resolution_clock::now();
-        root = search(root, tofind[i]);
-        end = std::chrono::high_resolution_clock::now();
-        duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-        sum_of_searches += duration;
-
-    }
-
-    // std::cout << "Inorder: ";
-    // inorder(root);
-    
-    // std::cout << "Czas wykonania: " << duration.count() << " nanoseconds" << std::endl;
-    std::cout << sum_of_searches.count() << " nanoseconds ";
-    std::cout << creation_times[0].count();
     return 0;
 }
