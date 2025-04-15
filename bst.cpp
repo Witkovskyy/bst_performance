@@ -67,6 +67,15 @@ void postorder(Tree* root) {
 
 int main() {
 
+    std::ofstream file("bst.txt", std::ios::app);
+
+    if (file.is_open()) {
+        file << "Czas tworzenia,Czas porządku wstecznego,Suma czasu wyszukiwania" << std::endl;
+    }
+
+    file.close();
+
+
     for (int iterator=1;iterator<16;iterator++){
 
         
@@ -170,7 +179,7 @@ int main() {
         std::ofstream file("bst.txt", std::ios::app);
 
         if (file.is_open()) {
-            file << creation_avg << "," << postorder_avg << std::endl;
+            file << creation_avg << "," << postorder_avg << "," << sum_of_searches.count() << std::endl;
         }
 
         file.close();
