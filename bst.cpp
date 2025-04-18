@@ -57,19 +57,25 @@ void preorder(Tree* root) {
     }
 }
 
-void postorder(Tree* root) {
+void postorder(Tree* root, int debug_a) {
     if (root) {
-        postorder(root->left);
-        postorder(root->right);
+        postorder(root->left, debug_a);
+        postorder(root->right, debug_a);
+        debug_a += 1;
         // std::cout << root->info << " ";
     }
 }
 
 int main() {
 
-    std::ofstream file("bst.txt", std::ios::app);
+    // std::ofstream file("bst.txt", std::ios::app);
+    std::ifstream checkfile("bst.txt");
+    bool isempty = checkfile.peek() == std::ifstream::traits_type::eof();
+    checkfile.close();
 
-    if (file.is_open()) {
+    std::ofstream file("bst.txt", std::ios::app);
+    if(file.is_open() && isempty)
+    {
         file << "Czas tworzenia,Czas porządku wstecznego,Suma czasu wyszukiwania" << std::endl;
     }
 
@@ -86,6 +92,7 @@ int main() {
         int* tofind = new int[n];
         int creation_avg;
         int postorder_avg;
+        int debug_a = 0;
         
 
         std::chrono::high_resolution_clock::time_point start;
@@ -95,13 +102,13 @@ int main() {
 
         std::random_device rand;
         std::mt19937 gen(rand());
-        std::uniform_int_distribution<> dist(1,10*n);
+        std::uniform_int_distribution<> dist(1,n*10);
 
-        std::vector<std::chrono::nanoseconds> creation_times = {};
-        std::vector<std::chrono::nanoseconds> postorder_times = {};
         std::vector<int> excluded = {}; 
         std::vector<int> numbers = {};
 
+        std::vector<std::chrono::nanoseconds> creation_times = {};
+        std::vector<std::chrono::nanoseconds> postorder_times = {};
         std::chrono::nanoseconds creation_sum(0);
         std::chrono::nanoseconds postorder_sum(0);
 
@@ -144,7 +151,7 @@ int main() {
 
             start = std::chrono::high_resolution_clock::now();
 
-            postorder(root);
+            postorder(root, debug_a);
 
             end = std::chrono::high_resolution_clock::now();
 
@@ -157,13 +164,13 @@ int main() {
         // inorder(root);
         
         // std::cout << "Czas wykonania: " << duration.count() << " nanoseconds" << std::endl;
-        std::cout << sum_of_searches.count() << " nanoseconds ";
-        std::cout << creation_times[0].count();
-        std::cout << postorder_times[0].count();
-        for(int i=0;i<postorder_times.size();i++)
-        {
-            std::cout << postorder_times[i].count() << std::endl;
-        }
+        // std::cout << sum_of_searches.count() << " nanoseconds ";
+        // std::cout << creation_times[0].count();
+        // std::cout << postorder_times[0].count();
+        // for(int i=0;i<postorder_times.size();i++)
+        // {
+        //     std::cout << postorder_times[i].count() << std::endl;
+        // }
 
         for(int k=0;k<10;k++){
             creation_sum+=creation_times[k];
@@ -174,7 +181,6 @@ int main() {
             postorder_sum+=postorder_times[k];
         }
         postorder_avg = postorder_sum.count()/10;
-
 
         std::ofstream file("bst.txt", std::ios::app);
 
