@@ -53,6 +53,14 @@ void printList(Node* head) {
     std::cout << std::endl;
 }
 
+void deleteList(Node*& head) {
+    while (head != nullptr) {
+        Node* temp = head;
+        head = head->next;
+        delete temp;
+    }
+}
+
 int main() {
 
     std::ifstream checkfile("linked_list.txt");
@@ -62,7 +70,7 @@ int main() {
     std::ofstream file("linked_list.txt", std::ios::app);
     if(file.is_open() && isempty)
     {
-        file << "Czas tworzenia,Czas porządku wstecznego,Suma czasu wyszukiwania" << std::endl;
+        file << "Czas tworzenia,Czas usuwania listy,Suma czasu wyszukiwania" << std::endl;
     }
 
     file.close();
@@ -71,10 +79,11 @@ int main() {
     {
         Node* found = nullptr;
         Node* list = nullptr;
-        int n = 300*iterator;
+        int n = 1500*iterator;
         int* tofind = new int[n];
         int number;
-        int creation_avg;
+        long long creation_avg;
+        int deletion_time;
 
 
 
@@ -136,9 +145,26 @@ int main() {
     }
     creation_avg = creation_sum.count()/10;
 
+    start = std::chrono::high_resolution_clock::now();
+    deleteList(list);
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    deletion_time = duration.count();
+
+
+    
+
     // printList(list);
     // std::cout << creation_avg << std::endl;
-    std::cout << sum_of_searches.count() << std::endl;
+    // std::cout << sum_of_searches.count() << std::endl;
+
+    std::ofstream file("linked_list.txt", std::ios::app);
+    if (file.is_open()) {
+        file << creation_avg << "," << deletion_time << "," << sum_of_searches.count() << std::endl;
+    }
+
+    file.close();
+
     }
     
 
