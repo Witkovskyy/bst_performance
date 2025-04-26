@@ -65,6 +65,13 @@ void postorder(Tree* root, int debug_a) {
         // std::cout << root->info << " ";
     }
 }
+void delete_tree(Tree* root) {
+    if (root) {
+        delete_tree(root->left);
+        delete_tree(root->right);
+        delete root;
+    }
+}
 
 int main() {
 
@@ -156,7 +163,7 @@ int main() {
             end = std::chrono::high_resolution_clock::now();
 
             duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-
+            // delete_tree(root);
             postorder_times.push_back(duration);
         }
 
